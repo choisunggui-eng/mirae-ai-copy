@@ -219,8 +219,17 @@ if st.button(f"🚀 {platform} 전용 고효율 카피 생성 시작"):
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         
-        # 모델 자동 선택 (gemini-1.5-flash)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+# [수정포인트] 모델 경로를 더 명확하게 지정하고, 오류 시 대체 모델을 찾도록 설정
+        try:
+            # 우선순위 1: 가장 안정적인 경로로 시도
+            model = genai.GenerativeModel('models/gemini-1.5-flash')
+            # 테스트 실행 (실제 호출 가능 여부 확인)
+            model.generate_content("test", generation_config={"max_output_tokens": 1})
+        except:
+            # 우선순위 2: 만약 위 경로가 안 되면 사용 가능한 모델 목록에서 자동 선택
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            target_model = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in available_models else available_models[0]
+            model = genai.GenerativeModel(target_model)
         
         # 미래아이엔씨 스타일의 전문적인 프롬프트
         prompt = f"""
