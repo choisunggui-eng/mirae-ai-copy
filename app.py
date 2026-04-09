@@ -118,23 +118,16 @@ st.markdown("""
         color: #2563EB !important;
     }
     
-/* 매체 심볼 스타일: 어떤 이미지가 들어와도 일정한 크기로 박제 */
+/* 매체 심볼 스타일: 어떤 이미지가 들어와도 큼직하고 일정한 크기로 박제 */
     .symbol-container img {
-        width: 60px !important;   /* 가로 길이를 고정 */
-        height: 40px !important;  /* 세로 길이를 고정 */
-        object-fit: contain;      /* 중요! 비율을 유지하면서 박스 안에 맞춤 */
-        border: 1px solid #E2E8F0;
-        border-radius: 4px;
-        padding: 4px;
-        background-color: #FFFFFF;
-    }
-    .symbol-container img {
-        max-width: 50px; /* 심볼 크기 축소 */
-        max-height: 40px;
-        border: 1px solid #E2E8F0; /* 은은한 테두리 추가 */
-        border-radius: 4px; /* 테두리 둥글게 */
-        padding: 4px; /* 테두리 안쪽 여백 */
-        background-color: #FFFFFF; /* 테두리 배경색 */
+        width: 100px !important;  /* 가로 길이를 100px로 확대 */
+        height: 60px !important;   /* 세로 길이를 60px로 확대 */
+        object-fit: contain;      /* 비율 유지하며 박스 채우기 */
+        border: 1px solid #E2E8F0; /* 은은한 테두리 */
+        border-radius: 4px;        /* 모서리 곡선 */
+        padding: 4px;              /* 안쪽 여백 */
+        background-color: #FFFFFF; /* 흰색 배경 */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 고급스러운 그림자 */
     }
     </style>
     """, unsafe_allow_html=True)
