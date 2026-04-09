@@ -196,4 +196,15 @@ if st.button("🚀 회사 전용 AI 카피 생성 시작"):
             
             조건:
             1. 타겟의 페인 포인트(Pain Point)를 정확히 찌를 것.
-            2. 미래아이엔씨만의 전문성이 느껴지는 세련된 문
+            2. 미래아이엔씨만의 전문성이 느껴지는 세련된 문체.
+            3. 적절한 이모지를 사용하여 가독성을 높일 것.
+            4. 각 카피는 제목과 본문 느낌으로 구분해서 써줘.
+            """
+            
+            with st.spinner('AI가 고효율 카피를 도출하고 있습니다...'):
+                response = model.generate_content(prompt)
+                st.balloons() # 성공 축하 풍선!
+                st.markdown(f'<div class="result-box" style="white-space: pre-wrap;">{response.text}</div>', unsafe_allow_html=True)
+                st.caption("Produced by Mirae I&C Marketing Solution")
+        except Exception as e:
+            st.error(f"오류 발생: {e}")
