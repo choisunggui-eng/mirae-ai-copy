@@ -21,9 +21,8 @@ st.markdown("""
     .main-title { color: #333333; font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 0.5rem; }
     .sub-title { color: #666666; font-size: 1rem; text-align: center; margin-bottom: 2.5rem; font-weight: 400; line-height: 1.5; }
     .stTextInput label, .stTextArea label { color: #333333 !important; font-weight: 600 !important; font-size: 0.95rem !important; }
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea { border-color: #E2E8F0 !important; border-radius: 8px !important; }
+    .stTextInput>div>div>input { border-color: #E2E8F0 !important; border-radius: 8px !important; }
     .stButton>button { width: 100%; background-color: #0033FF !important; color: white !important; border-radius: 8px !important; font-weight: bold !important; height: 3em !important; border: none !important; transition: all 0.2s ease; }
-    .stButton>button:hover { background-color: #0022AA !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,51,255,0.2); }
     .result-box { border: 1px solid #E2E8F0; border-radius: 8px; padding: 1.5rem; background-color: #F8FAFC; line-height: 1.7; color: #333333; }
     [data-testid="stSidebar"] { background-color: #FFFFFF; border-right: 1px solid #F1F5F9; }
     [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p { color: #333333 !important; font-weight: 500 !important; }
@@ -41,7 +40,7 @@ with st.sidebar:
     st.write("---")
     try:
         api_key = st.secrets["GEMINI_API_KEY"]
-        st.success("✅ AI 엔진 준비 완료")
+        st.success("✅ AI 엔진 가동 준비 완료")
     except:
         api_key = None
         st.warning("⚠️ API 키 설정 필요")
@@ -66,16 +65,20 @@ with col2:
     keywords = st.text_input("✨ 핵심 키워드", placeholder="예: 개별포장, 쫄깃함")
 target = st.text_input("👥 타겟 고객", placeholder="예: 30대 바쁜 직장인")
 
-# 7. 생성 로직 (워딩 수정됨)
+# 7. 생성 로직 (모델 자동 검색 기능 추가)
 if st.button("🚀 미래아이엔씨 고효율 카피 생성"):
     if not api_key:
         st.error("API 키가 설정되지 않았습니다.")
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
             
-            # 워딩 수정된 프롬프트
+            # [수정포인트] 사용 가능한 모델 중 'gemini-1.5-flash'를 우선 찾고, 없으면 첫 번째 가능한 모델 선택
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            target_model = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in available_models else available_models[0]
+            
+            model = genai.GenerativeModel(target_model)
+            
             prompt = f"""
             너는 광고 성과를 극대화하는 '미래아이엔씨'의 퍼포먼스 마케팅 전문가야.
             아래 정보를 바탕으로 클릭률(CTR)이 폭발하는 광고 카피 5개를 작성해줘.
@@ -89,7 +92,7 @@ if st.button("🚀 미래아이엔씨 고효율 카피 생성"):
             그 뒤에 각 카피별로 [헤드라인]과 [바디카피]를 구분해서 세련되게 작성해줘.
             """
             
-            with st.spinner('AI가 데이터를 분석하여 카피를 추출 중입니다...'):
+            with st.spinner('AI가 최적의 카피를 생성 중입니다...'):
                 response = model.generate_content(prompt)
                 st.balloons()
                 st.markdown(f'<div class="result-box" style="white-space: pre-wrap;">{response.text}</div>', unsafe_allow_html=True)
