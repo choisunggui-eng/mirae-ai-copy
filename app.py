@@ -1,114 +1,127 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
 import google.generativeai as genai
+import base64
 
 # 1. 페이지 설정 (탭 이름과 아이콘)
 st.set_page_config(page_title="미래아이엔씨 카피 치트키", page_icon="🔵", layout="centered")
 
-# 2. 미래아이엔씨 전용 테마 디자인 (CSS)
+# 2. 로고 이미지를 화면에 표시하기 위한 함수 (깃허브에 올린 mirae_logo.png 활용)
+def get_image_base64(path):
+    with open(path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    return encoded_string
+
+# 3. 초심플 회사 맞춤형 디자인 (CSS)
 st.markdown("""
     <style>
-    /* 배경색: 미래아이엔씨의 깔끔한 느낌 */
+    /* 배경색: 완전 흰색으로 깔끔하게 */
     .stApp {
-        background-color: #F8FAFC;
+        background-color: #FFFFFF;
     }
     
-    /* 메인 타이틀: 회사 로고 느낌 반영 */
+    /* 로고 중앙 정렬 */
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    .logo-container img {
+        max-width: 250px; /* 로고 크기 조절 */
+    }
+
+    /* 타이틀 및 서브 타이틀: 회사 폰트 느낌 반영 */
     .main-title {
-        color: #0033FF; /* 미래아이엔씨 블루 */
-        font-size: 2.5rem;
-        font-weight: 900;
+        color: #333333; /* 블랙 */
+        font-size: 2rem;
+        font-weight: 800;
         text-align: center;
         margin-bottom: 0.5rem;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
     .sub-title {
-        color: #333333;
-        font-size: 1.2rem;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-weight: 500;
-    }
-
-    /* 강조 박스: 신뢰감 있는 블랙/블루 조합 */
-    .black-box {
-        background: linear-gradient(135deg, #1E1E2F 0%, #0033FF 100%);
-        color: #FFFFFF;
-        padding: 2.5rem;
-        border-radius: 20px;
+        color: #666666; /* 그레이 */
+        font-size: 1.1rem;
         text-align: center;
         margin-bottom: 2.5rem;
-        box-shadow: 0 10px 20px rgba(0,51,255,0.2);
+        font-weight: 400;
     }
 
-    /* 입력창 라벨 스타일 */
-    .stTextInput label {
-        color: #1E293B !important;
-        font-weight: bold !important;
+    /* 입력창 라벨 스타일: 더 얇고 깔끔하게 */
+    .stTextInput label, .stTextArea label {
+        color: #333333 !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+    }
+    
+    /* 입력창 테두리색: 더 옅게 */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        border-color: #E2E8F0 !important;
+        border-radius: 8px !important;
     }
 
-    /* 생성 버튼: 미래아이엔씨 블루 */
+    /* 생성 버튼: 미래아이엔씨 블루, 더 얇고 세련되게 */
     .stButton>button {
         width: 100%;
-        background-color: #0033FF !important;
+        background-color: #0033FF !important; /* 미래 블루 */
         color: white !important;
-        border-radius: 12px !important;
+        border-radius: 8px !important;
         font-weight: bold !important;
-        height: 3.5em !important;
+        height: 3em !important;
         border: none !important;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
     
     .stButton>button:hover {
         background-color: #0022AA !important;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,51,255,0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,51,255,0.2);
     }
 
-    /* 결과 박스: 깔끔하고 고급스러운 마감 */
+    /* 결과 박스: 그냥 일반적인 깔끔한 마감 */
     .result-box {
-        border: 2px solid #E2E8F0;
-        border-radius: 15px;
-        padding: 2rem;
-        background-color: #FFFFFF;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-        line-height: 1.8;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        background-color: #F8FAFC; /* 아주 연한 회색 배경 */
+        line-height: 1.7;
+        color: #333333;
     }
     
-    /* 사이드바 스타일링 */
+    /* 사이드바 스타일링: 더 튀지 않게 */
     [data-testid="stSidebar"] {
-        background-color: #F1F5F9;
-        border-right: 1px solid #E2E8F0;
+        background-color: #FFFFFF;
+        border-right: 1px solid #F1F5F9;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. 사이드바 (Secrets 연동)
+# 4. 사이드바 (Secrets 연동) - 여기는 최소한의 정보만 표시
 with st.sidebar:
-    st.markdown(f'<h2 style="color:#0033FF;">MIRAE I&C</h2>', unsafe_allow_html=True)
+    st.markdown(f'<h3 style="color:#0033FF; text-align:center;">MIRAE I&C</h3>', unsafe_allow_html=True)
     st.write("---")
     try:
         api_key = st.secrets["GEMINI_API_KEY"]
-        st.success("✅ 회사 전용 AI 엔진 가동 중")
+        st.success("✅ AI 엔진 준비 완료")
     except:
         api_key = None
-        st.warning("⚠️ Secrets에 키를 등록해주세요.")
+        st.warning("⚠️ Secrets 설정 필요")
     
-    st.info("미래아이엔씨 마케팅팀 전용 AI 카피라이팅 툴입니다. 제품 정보만 입력하면 고효율 카피가 생성됩니다.")
+    st.info("회사 전용 카피라이팅 솔루션입니다.")
 
-# 4. 메인 화면 구성
-st.markdown('<div class="main-title">MIRAE I&C AI COPY-WRITER</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">"상위 0.1% 퍼포먼스 마케팅의 정수, 미래아이엔씨 AI 엔진"</div>', unsafe_allow_html=True)
+# 5. 메인 화면 구성 - 로고 삽입
+try:
+    # 깃허브에 올린 mirae_logo.png 파일을 불러와서 표시
+    image_base64 = get_image_base64("mirae_logo.png")
+    st.markdown(f'<div class="logo-container"><img src="data:image/png;base64,{image_base64}"></div>', unsafe_allow_html=True)
+except Exception as e:
+    # 로고 파일이 없으면 그냥 텍스트로 표시
+    st.markdown('<div class="main-title">MIRAE I&C</div>', unsafe_allow_html=True)
 
-st.markdown("""
-<div class="black-box">
-    <div style="color: #FFD700; font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">[최성규 과장 특제 마케팅 솔루션]</div>
-    <div style="font-size: 1.4rem; font-weight: bold; line-height: 1.4;">불필요한 고민 시간은 줄이고,<br>매출 성과는 극대화합니다.</div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="main-title">AI 카피라이팅 솔루션</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">"미래아이엔씨의 전문성을 담아, 고효율 카피를 단 3초 만에"</div>', unsafe_allow_html=True)
 
-# 5. 입력창 (2열 배치)
+# 6. 입력창 (2열 배치) - 깔끔하게
 col1, col2 = st.columns(2)
 with col1:
     product = st.text_input("📦 제품명 (Product)", placeholder="예: 꽈배기")
@@ -119,15 +132,15 @@ target = st.text_input("👥 타겟 고객 (Target Audience)", placeholder="예:
 
 st.write("") # 간격 조절
 
-# 6. 생성 로직
-if st.button("🚀 미래아이엔씨 AI 카피 생성 시작"):
+# 7. 생성 로직
+if st.button("🚀 회사 전용 AI 카피 생성"):
     if not api_key:
         st.error("API 키가 설정되지 않았습니다. 관리자에게 문의하세요.")
     else:
         try:
             genai.configure(api_key=api_key)
             
-            # 모델 자동 선택
+            # 모델 자동 선택 (gemini-1.5-flash)
             model_name = 'gemini-1.5-flash'
             try:
                 for m in genai.list_models():
@@ -154,10 +167,10 @@ if st.button("🚀 미래아이엔씨 AI 카피 생성 시작"):
             4. 각 카피는 제목과 본문 느낌으로 구분해서 써줘.
             """
             
-            with st.spinner('미래아이엔씨 AI가 최적의 카피를 도출하고 있습니다...'):
+            with st.spinner('AI가 고효율 카피를 도출하고 있습니다...'):
                 response = model.generate_content(prompt)
                 st.balloons() # 성공 축하 풍선!
                 st.markdown(f'<div class="result-box" style="white-space: pre-wrap;">{response.text}</div>', unsafe_allow_html=True)
-                st.caption("Produced by Mirae I&C Marketing Solution V2.0")
+                st.caption("Produced by Mirae I&C Marketing Solution")
         except Exception as e:
             st.error(f"오류 발생: {e}")
