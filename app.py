@@ -118,13 +118,15 @@ st.markdown("""
         color: #2563EB !important;
     }
     
-    /* 매체 심볼 스타일: 0.1% 마케터의 감각적인 디테일 */
-    .symbol-container {
-        display: flex;
-        align-items: center; /* 수직 중앙 정렬 */
-        justify-content: flex-start; /* 수평 왼쪽 정렬 */
-        height: 100%; /* 부모 컬럼 높이 맞춤 */
-        margin-top: 1.5rem; /* 라벨과 높이 맞춤 */
+/* 매체 심볼 스타일: 어떤 이미지가 들어와도 일정한 크기로 박제 */
+    .symbol-container img {
+        width: 60px !important;   /* 가로 길이를 고정 */
+        height: 40px !important;  /* 세로 길이를 고정 */
+        object-fit: contain;      /* 중요! 비율을 유지하면서 박스 안에 맞춤 */
+        border: 1px solid #E2E8F0;
+        border-radius: 4px;
+        padding: 4px;
+        background-color: #FFFFFF;
     }
     .symbol-container img {
         max-width: 50px; /* 심볼 크기 축소 */
